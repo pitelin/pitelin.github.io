@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./statics/github.css">
+    <link rel="stylesheet" href="./statics/theme.css">
+    <script src="./statics/modules/jquery.min.js"></script>
+    <script type="module">
+        import { IO } from "./statics/modules/tools.js"
+
+        let functions = [
+            {
+                "name": "干燥失重结果计算",
+                "location": "./views/lod.html"
+            },
+            {
+                "name": "炽灼残渣结果计算",
+                "location": "./views/roi.html"
+            },
+            {
+                "name": "进样时间推算",
+                "location": "./views/injection-sequence.html"
+            },
+            {
+                "name": "仪器/对照品效期查询",
+                "location": "./views/expir-info.html"
+            },
+            {
+                "name": "检验操作规程",
+                "location": "./views/sop.html"
+            },
+            {
+                "name": "QC计算工具集",
+                "location": "./views/rsd.html"
+            },
+            {
+                "name": "各国药典/中检所对照品检索",
+                "location": "./views/statue.html"
+            }
+        ]
+
+        $(() => {
+            // 加载功能列表
+            functions.forEach(value => {
+                let onclick = `window.location.href='${value.location}'`
+                let div = `<div class="item" onclick="${onclick}">${value.name}</div>`
+                $(".list").append(div)
+            })
+        })
+    </script>
+    <title>Sunpharm QC 工具</title>
+    <style>
+        /* 基础样式增强 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            background-color: #f6f8fa;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h4 {
+            color: #0366d6;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .item {
+            background-color: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .item:hover {
+            border-color: #0366d6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .about {
+            background-color: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 16px;
+        }
+        
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h4>功能列表</h4>
+    <div class="list"></div>
+    <h4>关于</h4>
+    <div class="about">
+        <p>建议使用系统自带浏览器，以完善使用体验！</p>
+        © 2025 longlife 版权所有。
+    </div>
+</body>
+
+</html>
