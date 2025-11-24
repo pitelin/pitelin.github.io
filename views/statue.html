@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>各国法规查询工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 35px;
+        }
+        
+        .regulation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+        }
+        
+        .regulation-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eaeaea;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .regulation-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+        
+        .regulation-header {
+            background: linear-gradient(90deg, #1a2a6c, #2c3e50);
+            color: white;
+            padding: 22px;
+            text-align: center;
+        }
+        
+        .regulation-body {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .regulation-description {
+            margin-bottom: 22px;
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 24px;
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            margin-top: auto;
+        }
+        
+        .btn:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 42, 108, 0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            color: #666;
+            margin-top: 40px;
+            border-top: 1px solid #eaeaea;
+            font-size: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .regulation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+        }
+        
+        .country-flag {
+            font-size: 26px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .regulation-header h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>法规查询工具</h1>
+            <p>快速访问各国药品法规和标准目录</p>
+        </div>
+        
+        <div class="content">
+            <div class="regulation-grid">
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇨🇳</span>蒲公英</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询最新版内容，包括药品标准、检验方法等权威信息。</p>
+                        <a href="https://db2.ouryao.com/" target="_blank" class="btn">访问蒲公英</a>
+                    </div>
+                </div>
+                
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇨🇳</span>中国药典</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询《中华人民共和国药典》最新版内容，包括药品标准、检验方法等权威信息。</p>
+                        <a href="https://www.bopuyun.com/yaodian/2025/" target="_blank" class="btn">访问中国药典</a>
+                    </div>
+                </div>
+
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇺🇸</span>美国药典 (USP)</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询美国药典委员会发布的药品质量标准、检验方法和相关技术指南。</p>
+                        <a href="https://www.usp.org/" target="_blank" class="btn">访问USP</a>
+                    </div>
+                </div>
+
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇬🇧</span>英国药典 (BP)</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询英国药典委员会发布的药品质量标准、检验方法和相关技术指南。</p>
+                        <a href="https://www.pharmacopoeia.com/" target="_blank" class="btn">访问BP</a>
+                    </div>
+                </div>
+
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇪🇺</span>欧洲药典 (EP)</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询欧洲药品质量管理局发布的欧洲药典标准，适用于欧洲市场药品。</p>
+                        <a href="https://www.edqm.eu/en/european-pharmacopoeia-ph.-eur.-11th-edition" target="_blank" class="btn">访问EP</a>
+                    </div>
+                </div>
+                
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🇯🇵</span>日本药典 (JP)</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询日本药局方，日本国内药品标准和技术要求的权威来源。</p>
+                        <a href="https://www.pmda.go.jp/english/rs-sb-std/standards-development/jp/0019.html" target="_blank" class="btn">访问JP</a>
+                    </div>
+                </div>
+
+               <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">St</span>博普智库 </h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">国内外药典法规综合检索，制药人必备知识工具。</p>
+                        <a href="https://www.bopuyun.com/yaodian/search/" target="_blank" class="btn">访问</a>
+                    </div>
+                </div>
+      
+                <div class="regulation-card">
+                    <div class="regulation-header">
+                        <h3><span class="country-flag">🔬</span>国家药品标准物质目录</h3>
+                    </div>
+                    <div class="regulation-body">
+                        <p class="regulation-description">查询国家药品标准物质目录，包括标准品、对照品等参考物质的详细信息。</p>
+                        <a href="http://aoc.nifdc.org.cn/sell/home/search.html" target="_blank" class="btn">访问标准物质目录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>各国法规查询工具 &copy; 2025 | 为药品研发和质量控制提供便捷的法规访问入口</p>
+        </div>
+    </div>
+
+    <script>
+        // 添加简单的交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.regulation-card');
+            
+            cards.forEach((card, index) => {
+                // 添加延迟动画
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+</body>
+</html>

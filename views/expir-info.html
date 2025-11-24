@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>效期查询</title>
+    <link rel="stylesheet" href="../statics/github.css">
+    <link rel="stylesheet" href="../statics/theme.css">
+    <style>
+        .searchbox {
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        #keyword {
+            width: 80%;
+        }
+
+        #search {
+            width: 15%;
+        }
+
+        .pure-table {
+            width: 100%;
+            font-size: small;
+        }
+
+        .pure-table caption {
+            font-style: normal;
+        }
+
+        .expir30 {
+            color: orange;
+
+        }
+
+        .expir7 {
+            color: red;
+        }
+
+        .expired {
+            color: red;
+            text-decoration: line-through;
+        }
+    </style>
+    <script src="../statics/modules/jquery.min.js"></script>
+    <script>
+        // 可用于查询的数据
+        const databases = [
+            {
+                "name": "device",
+                "path": "../statics/info/device.json"
+            },
+            {
+                "name": "standard",
+                "path": "../statics/info/standard.json"
+            }
+        ]
+
+        let info = {}
+        $(() => {
+            let count = databases.length
+            let interval = setInterval(() => {
+                if (count == 0) {
+                    $("#content").append("已加载所有数据")
+                    clearInterval(interval)
+                }
+            }, 100)
+
+            // 加载所有数据
+            for (const database of databases) {
+                $.getJSON(database.path, (data) => {
+                    info[database.name] = data
+                    count = --count
+                    switch (database.name) {
+                        case "device":
+                            $("#content").append(`已加载设备数据，共 ${data.length} 条<br>`)
+                            break
+                        case "standard":
+                            $("#content").append(`已加载对照品数据，共 ${data.length} 条<br>`)
+                            break
+                        default:
+                            break
+                    }
+                })
+            }
+
+            $("#search").click(() => {
+                let keyword = $("#keyword").val().toLowerCase()
+                $("#content").empty()
+                searchDevice(keyword)
+                searchStandard(keyword)
+            })
+        })
+
+        function searchDevice(keyword) {
+            let device = info.device.filter((value) => {
+                return value.id.toLowerCase().includes(keyword)
+            })
+            if (device.length > 0) {
+                let table_device = createDeviceTable(device)
+                $("#content").append(table_device)
+            }
+        }
+
+        function searchStandard(keyword) {
+            let standard = info.standard.filter((value) => {
+                return value.batch.toLowerCase().includes(keyword)
+            })
+            if (standard.length > 0) {
+                let table_standard = createStandardTable(standard)
+                $("#content").append(table_standard)
+            }
+        }
+
+        function createDeviceTable(data) {
+            return createTable(data, `设备信息（${data.length}条）`, ["名称", "编号", "有效期至"], ["where"])
+        }
+
+        function createStandardTable(data) {
+            return createTable(data, `对照品信息（${data.length}条）`, ["批号", "有效期至", "含量丨纯度"], ["kind"])
+        }
+
+        function createTable(data, captionText, header, hidden = []) {
+            let table = document.createElement("table")
+            table.setAttribute("class", "pure-table")
+
+            let caption = document.createElement("caption")
+            caption.innerText = captionText
+            table.appendChild(caption)
+
+            let tr = document.createElement("tr")
+            for (const headerText of header) {
+                let th = document.createElement("th")
+                th.innerText = headerText
+                tr.appendChild(th)
+            }
+            table.appendChild(tr)
+
+            data.forEach(element => {
+                let tr = document.createElement("tr")
+                for (const key in element) {
+                    if (Object.hasOwnProperty.call(element, key)) {
+                        if (hidden.includes(key)) {
+                            continue
+                        }
+                        const value = element[key]
+                        let td = document.createElement("td")
+                        td.innerHTML = (key == "expir") ? checkExpir(value) : value
+                        tr.appendChild(td)
+                    }
+                }
+                table.appendChild(tr)
+            })
+
+            return table
+        }
+
+        function checkExpir(value) {
+            let date = new Date()
+            let array = value.split(".")
+            date.setFullYear(array[0], array[1] - 1, array[2])
+
+            let day = (date - Date.now()) / 86400000
+
+            if (day <= 0) {
+                return `<span class='expired'>${value}</span>`
+            }
+
+            if (day <= 7) {
+                return `<span class='expir7'>${value}</span>`
+            }
+
+            if (day <= 30) {
+                return `<span class='expir30'>${value}</span>`
+            }
+
+            return value
+        }
+    </script>
+</head>
+
+<body>
+    <div class="searchbox">
+        <input type="text" name="keyword" id="keyword" placeholder="输入查询关键字（忽略大小写）">
+        <button type="submit" id="search">搜索</button>
+    </div>
+
+    <div id="content"></div>
+    <div>
+        <p>
+            过期提醒：<br>
+            <span class="expir30">黄色表示有效期剩余 30 天</span><br>
+            <span class="expir7">红色表示有效期剩余 7 天</span><br>
+            <span class="expired">红色加删除线表示已过期</span><br>
+        </p>
+    </div>
+</body>
+
+</html>
