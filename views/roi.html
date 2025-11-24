@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>干燥失重计算器</title>
+    <title>炽灼残渣计算器</title>
     <style>
         * {
             box-sizing: border-box;
@@ -110,13 +110,13 @@
     </style>
 </head>
 <body>
-    <h1>干燥失重计算器</h1>
+    <h1>炽灼残渣计算器</h1>
     
     <div class="container">
         <div>
             <h3>第一组</h3>
             <div class="input-group">
-                <label for="m0l">恒重后空瓶重量 (W₀)</label>
+                <label for="m0l">空瓶重量 (W₀)</label>
                 <input type="number" id="m0l" placeholder="输入重量值">
             </div>
             <div class="input-group">
@@ -124,15 +124,15 @@
                 <input type="number" id="m1l" placeholder="输入重量值">
             </div>
             <div class="input-group">
-                <label for="m3l">干燥后重量 (W₂)</label>
-                <input type="number" id="m3l" placeholder="输入重量值">
+                <label for="m2l">灼烧后重量 (W₂)</label>
+                <input type="number" id="m2l" placeholder="输入重量值">
             </div>
         </div>
         
         <div>
             <h3>第二组</h3>
             <div class="input-group">
-                <label for="m0r">恒重后空瓶重量 (W₀)</label>
+                <label for="m0r">空瓶重量 (W₀)</label>
                 <input type="number" id="m0r" placeholder="输入重量值">
             </div>
             <div class="input-group">
@@ -140,19 +140,19 @@
                 <input type="number" id="m1r" placeholder="输入重量值">
             </div>
             <div class="input-group">
-                <label for="m3r">干燥后重量 (W₂)</label>
-                <input type="number" id="m3r" placeholder="输入重量值">
+                <label for="m2r">灼烧后重量 (W₂)</label>
+                <input type="number" id="m2r" placeholder="输入重量值">
             </div>
         </div>
     </div>
     
     <div class="formula">
-        计算公式: <strong>(W₁ – W₂) ÷ (W₁ – W₀) × 100%</strong>
+        计算公式: <strong>(W₂ – W₀) ÷ (W₁ – W₀) × 100%</strong>
     </div>
     
     <div class="buttons">
         <button id="clear">清除数据</button>
-        <button id="ok">计算干燥失重</button>
+        <button id="ok">计算炽灼残渣</button>
     </div>
     
     <div class="result-box">
@@ -166,8 +166,8 @@
             const clearBtn = document.getElementById('clear');
             const resultsDiv = document.getElementById('results');
             
-            // 计算干燥失重
-            function calculateLOD(W0, W1, W2) {
+            // 计算炽灼残渣
+            function calculateResidue(W0, W1, W2) {
                 if (!W0 || !W1 || !W2) return null;
                 
                 // 转换为数字
@@ -175,8 +175,8 @@
                 W1 = parseFloat(W1);
                 W2 = parseFloat(W2);
                 
-                // 计算干燥失重百分比
-                const numerator = W1 - W2;      // W1 - W2
+                // 计算炽灼残渣百分比
+                const numerator = W2 - W0;      // W2 - W0
                 const denominator = W1 - W0;    // W1 - W0
                 const result = (numerator / denominator) * 100;
                 
@@ -184,33 +184,33 @@
             }
             
             // 显示计算结果
-            function displayResults(lod1, lod2) {
+            function displayResults(residue1, residue2) {
                 let resultsHTML = '';
                 
-                if (lod1 && lod2) {
-                    const average = ((parseFloat(lod1) + parseFloat(lod2)) / 2).toFixed(4);
+                if (residue1 && residue2) {
+                    const average = ((parseFloat(residue1) + parseFloat(residue2)) / 2).toFixed(4);
                     
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第一组干燥失重:</strong> ${lod1}%
+                            <strong>第一组炽灼残渣:</strong> ${residue1}%
                         </div>
                         <div class="result-item">
-                            <strong>第二组干燥失重:</strong> ${lod2}%
+                            <strong>第二组炽灼残渣:</strong> ${residue2}%
                         </div>
                         <div class="result-item average">
                             <strong>平均值:</strong> ${average}%
                         </div>
                     `;
-                } else if (lod1) {
+                } else if (residue1) {
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第一组干燥失重:</strong> ${lod1}%
+                            <strong>第一组炽灼残渣:</strong> ${residue1}%
                         </div>
                     `;
-                } else if (lod2) {
+                } else if (residue2) {
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第二组干燥失重:</strong> ${lod2}%
+                            <strong>第二组炽灼残渣:</strong> ${residue2}%
                         </div>
                     `;
                 } else {
@@ -225,17 +225,17 @@
                 // 获取输入值
                 const m0l = document.getElementById('m0l').value;
                 const m1l = document.getElementById('m1l').value;
-                const m3l = document.getElementById('m3l').value;
+                const m2l = document.getElementById('m2l').value;
                 const m0r = document.getElementById('m0r').value;
                 const m1r = document.getElementById('m1r').value;
-                const m3r = document.getElementById('m3r').value;
+                const m2r = document.getElementById('m2r').value;
                 
-                // 计算干燥失重
-                const lod1 = calculateLOD(m0l, m1l, m3l);
-                const lod2 = calculateLOD(m0r, m1r, m3r);
+                // 计算炽灼残渣
+                const residue1 = calculateResidue(m0l, m1l, m2l);
+                const residue2 = calculateResidue(m0r, m1r, m2r);
                 
                 // 显示结果
-                displayResults(lod1, lod2);
+                displayResults(residue1, residue2);
             });
             
             // 清除按钮点击事件
@@ -247,12 +247,12 @@
                     });
                     
                     // 清空结果显示
-                    resultsDiv.innerHTML = '<p>请输入数据并点击"计算干燥失重"按钮</p>';
+                    resultsDiv.innerHTML = '<p>请输入数据并点击"计算炽灼残渣"按钮</p>';
                 }
             });
             
             // 初始显示
-            resultsDiv.innerHTML = '<p>请输入数据并点击"计算干燥失重"按钮</p>';
+            resultsDiv.innerHTML = '<p>请输入数据并点击"计算炽灼残渣"按钮</p>';
         });
     </script>
 </body>
