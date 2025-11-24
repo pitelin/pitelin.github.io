@@ -80,13 +80,6 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
         }
-        .calculation-steps {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-        }
         .result-item {
             margin: 10px 0;
             padding: 10px;
@@ -100,6 +93,11 @@
             padding: 15px;
             background-color: #e8f4fc;
             border-radius: 8px;
+        }
+        .average {
+            background-color: #e1f5e1 !important;
+            font-weight: bold;
+            font-size: 18px;
         }
         @media (max-width: 600px) {
             .container {
@@ -159,7 +157,6 @@
     
     <div class="result-box">
         <h2>计算结果</h2>
-        <div id="calculationSteps"></div>
         <div id="results"></div>
     </div>
 
@@ -168,7 +165,6 @@
             const calculateBtn = document.getElementById('ok');
             const clearBtn = document.getElementById('clear');
             const resultsDiv = document.getElementById('results');
-            const stepsDiv = document.getElementById('calculationSteps');
             
             // 计算干燥失重
             function calculateLOD(W0, W1, W2) {
@@ -184,52 +180,7 @@
                 const denominator = W1 - W0;    // W1 - W0
                 const result = (numerator / denominator) * 100;
                 
-                return {
-                    value: result.toFixed(4),
-                    steps: {
-                        W0: W0,
-                        W1: W1,
-                        W2: W2,
-                        numerator: numerator.toFixed(4),
-                        denominator: denominator.toFixed(4),
-                        formula: `(${W1} - ${W2}) ÷ (${W1} - ${W0}) × 100%`
-                    }
-                };
-            }
-            
-            // 显示计算步骤
-            function displayCalculationSteps(lod1, lod2) {
-                let stepsHTML = '<h3>计算过程</h3>';
-                
-                if (lod1) {
-                    stepsHTML += `
-                        <div class="calculation-steps">
-                            <h4>第一组计算过程:</h4>
-                            <p>W₀ = ${lod1.steps.W0}</p>
-                            <p>W₁ = ${lod1.steps.W1}</p>
-                            <p>W₂ = ${lod1.steps.W2}</p>
-                            <p>分子 (W₁ - W₂) = ${lod1.steps.numerator}</p>
-                            <p>分母 (W₁ - W₀) = ${lod1.steps.denominator}</p>
-                            <p>计算公式: ${lod1.steps.formula}</p>
-                        </div>
-                    `;
-                }
-                
-                if (lod2) {
-                    stepsHTML += `
-                        <div class="calculation-steps">
-                            <h4>第二组计算过程:</h4>
-                            <p>W₀ = ${lod2.steps.W0}</p>
-                            <p>W₁ = ${lod2.steps.W1}</p>
-                            <p>W₂ = ${lod2.steps.W2}</p>
-                            <p>分子 (W₁ - W₂) = ${lod2.steps.numerator}</p>
-                            <p>分母 (W₁ - W₀) = ${lod2.steps.denominator}</p>
-                            <p>计算公式: ${lod2.steps.formula}</p>
-                        </div>
-                    `;
-                }
-                
-                stepsDiv.innerHTML = stepsHTML;
+                return result.toFixed(4);
             }
             
             // 显示计算结果
@@ -237,29 +188,29 @@
                 let resultsHTML = '';
                 
                 if (lod1 && lod2) {
-                    const average = ((parseFloat(lod1.value) + parseFloat(lod2.value)) / 2).toFixed(4);
+                    const average = ((parseFloat(lod1) + parseFloat(lod2)) / 2).toFixed(4);
                     
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第一组干燥失重:</strong> ${lod1.value}%
+                            <strong>第一组干燥失重:</strong> ${lod1}%
                         </div>
                         <div class="result-item">
-                            <strong>第二组干燥失重:</strong> ${lod2.value}%
+                            <strong>第二组干燥失重:</strong> ${lod2}%
                         </div>
-                        <div class="result-item" style="background-color: #e1f5e1;">
+                        <div class="result-item average">
                             <strong>平均值:</strong> ${average}%
                         </div>
                     `;
                 } else if (lod1) {
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第一组干燥失重:</strong> ${lod1.value}%
+                            <strong>第一组干燥失重:</strong> ${lod1}%
                         </div>
                     `;
                 } else if (lod2) {
                     resultsHTML = `
                         <div class="result-item">
-                            <strong>第二组干燥失重:</strong> ${lod2.value}%
+                            <strong>第二组干燥失重:</strong> ${lod2}%
                         </div>
                     `;
                 } else {
@@ -284,7 +235,6 @@
                 const lod2 = calculateLOD(m0r, m1r, m3r);
                 
                 // 显示结果
-                displayCalculationSteps(lod1, lod2);
                 displayResults(lod1, lod2);
             });
             
@@ -297,7 +247,6 @@
                     });
                     
                     // 清空结果显示
-                    stepsDiv.innerHTML = '';
                     resultsDiv.innerHTML = '<p>请输入数据并点击"计算干燥失重"按钮</p>';
                 }
             });
