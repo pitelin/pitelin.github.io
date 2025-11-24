@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>计算工具集</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/regression@2.0.1/dist/regression.min.js"></script>
+    <title>分析计算工具集</title>
     <style>
         * {
             margin: 0;
@@ -15,7 +13,7 @@
         }
         
         body {
-            background-color: #ffffff;
+            background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
@@ -33,8 +31,8 @@
         }
         
         .header {
-            background: #f8f9fa;
-            color: #333;
+            background: #1a2a6c;
+            color: white;
             padding: 30px 20px;
             text-align: center;
             border-bottom: 1px solid #eaeaea;
@@ -43,11 +41,10 @@
         .header h1 {
             font-size: 32px;
             margin-bottom: 10px;
-            color: #1a2a6c;
         }
         
         .header p {
-            color: #666;
+            color: #e0e0e0;
             font-size: 18px;
             max-width: 800px;
             margin: 0 auto;
@@ -115,7 +112,7 @@
         }
         
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .input-group label {
@@ -197,15 +194,6 @@
             color: #1a2a6c;
         }
         
-        .chart-container {
-            margin-top: 20px;
-            height: 300px;
-            background: white;
-            border-radius: 6px;
-            padding: 15px;
-            border: 1px solid #eaeaea;
-        }
-        
         .interpretation {
             margin-top: 20px;
             padding: 15px;
@@ -244,40 +232,227 @@
             }
         }
         
-        .unit-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .unit-row input {
-            flex: 1;
-        }
-        
-        .unit-row span {
-            font-weight: bold;
-            color: #1a2a6c;
-            min-width: 40px;
+        .formula {
             text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f4fc;
+            border-radius: 8px;
+        }
+        
+        .data-group {
+            margin-bottom: 20px;
+        }
+        
+        .data-group h3 {
+            margin-bottom: 10px;
+            color: #1a2a6c;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>计算工具集</h1>
-            <p>为工作提供计算和分析工具</p>
+            <h1>分析计算工具集</h1>
+            <p>为实验分析提供计算支持</p>
         </div>
         
         <div class="tabs">
-            <button class="tab active" data-tab="conversion">浓度单位换算</button>
+            <button class="tab active" data-tab="rsd">相对标准偏差 (RSD)</button>
             <button class="tab" data-tab="recovery">回收率计算</button>
-            <button class="tab" data-tab="rsd">相对标准偏差 (RSD)</button>
-            <button class="tab" data-tab="calibration">标准曲线拟合</button>
+            <button class="tab" data-tab="calibration">线性回归</button>
+            <button class="tab" data-tab="conversion">浓度单位换算</button>
+        </div>
+        
+        <!-- 相对标准偏差 (RSD) -->
+        <div class="tab-content active" id="rsd">
+            <div class="calculator">
+                <div class="calculator-header">
+                    <h2>相对标准偏差 (RSD) 计算器</h2>
+                    <p>计算数据的相对标准偏差，评估测量精度</p>
+                </div>
+                <div class="calculator-content">
+                    <div>
+                        <div class="input-group">
+                            <label for="dataInput">输入数值（每行一个或逗号分隔）</label>
+                            <textarea id="dataInput" rows="6" placeholder="例如：
+23.5
+24.1
+22.8
+23.9
+24.5
+或
+23.5, 24.1, 22.8, 23.9, 24.5"></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="decimalPlaces">小数位数</label>
+                            <select id="decimalPlaces">
+                                <option value="2">2 位小数</option>
+                                <option value="3">3 位小数</option>
+                                <option value="4">4 位小数</option>
+                                <option value="5">5 位小数</option>
+                            </select>
+                        </div>
+                        
+                        <button id="calculateRsdBtn" class="btn">计算 RSD</button>
+                        <button id="clearRsdBtn" class="btn btn-clear" style="margin-top: 10px;">清除数据</button>
+                    </div>
+                    
+                    <div>
+                        <div class="results">
+                            <h3>计算结果</h3>
+                            <div class="result-item">
+                                <span class="result-label">数据数量 (n):</span>
+                                <span class="result-value" id="dataCount">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">平均值 (μ):</span>
+                                <span class="result-value" id="meanValue">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">标准偏差 (σ):</span>
+                                <span class="result-value" id="stdDevValue">-</span>
+                            </div>
+                            <div class="result-item" style="background: #e8f4ff;">
+                                <span class="result-label">相对标准偏差 (RSD):</span>
+                                <span class="result-value" id="rsdValue">-</span>
+                            </div>
+                            <div class="result-item" style="background: #e8f4ff;">
+                                <span class="result-label">RSD (%):</span>
+                                <span class="result-value" id="rsdPercentValue">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="interpretation">
+                            <h4>RSD 解释</h4>
+                            <p id="rsdInterpretation">输入数据以获取 RSD 解释</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 回收率计算 -->
+        <div class="tab-content" id="recovery">
+            <div class="calculator">
+                <div class="calculator-header">
+                    <h2>回收率计算</h2>
+                    <p>计算分析方法的回收率</p>
+                </div>
+                <div class="calculator-content">
+                    <div>
+                        <div class="input-group">
+                            <label for="measuredValue">测定值</label>
+                            <input type="number" id="measuredValue" placeholder="样品的测定值">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="expectedValue">理论值/加标值</label>
+                            <input type="number" id="expectedValue" placeholder="理论值或加标值">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="sampleAmount">样品量</label>
+                            <input type="number" id="sampleAmount" placeholder="样品量 (可选)">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="spikeAmount">加标量</label>
+                            <input type="number" id="spikeAmount" placeholder="加标量 (可选)">
+                        </div>
+                        
+                        <button id="calculateRecoveryBtn" class="btn">计算回收率</button>
+                    </div>
+                    
+                    <div>
+                        <div class="results">
+                            <h3>计算结果</h3>
+                            <div class="result-item">
+                                <span class="result-label">回收率:</span>
+                                <span class="result-value" id="recoveryResult">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">回收率百分比:</span>
+                                <span class="result-value" id="recoveryPercentResult">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="interpretation">
+                            <h4>回收率解释</h4>
+                            <p id="recoveryInterpretation">输入数据以获取回收率解释</p>
+                            <p><strong>参考标准:</strong></p>
+                            <ul>
+                                <li>优秀: 95-105%</li>
+                                <li>良好: 90-110%</li>
+                                <li>可接受: 85-115%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 线性回归 -->
+        <div class="tab-content" id="calibration">
+            <div class="calculator">
+                <div class="calculator-header">
+                    <h2>线性回归分析</h2>
+                    <p>使用标准品数据拟合线性回归方程并计算未知样品浓度</p>
+                </div>
+                <div class="calculator-content">
+                    <div>
+                        <div class="input-group">
+                            <label for="calibrationData">标准品数据 (浓度,响应值)</label>
+                            <textarea id="calibrationData" rows="6" placeholder="每行一组数据，格式：浓度,响应值
+例如：
+0.1, 125
+0.2, 250
+0.5, 620
+1.0, 1250
+2.0, 2480"></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="sampleResponse">未知样品响应值</label>
+                            <input type="number" id="sampleResponse" placeholder="输入未知样品的响应值">
+                        </div>
+                        
+                        <button id="calculateCalibrationBtn" class="btn">计算浓度</button>
+                        <button id="clearCalibrationBtn" class="btn btn-clear" style="margin-top: 10px;">清除数据</button>
+                    </div>
+                    
+                    <div>
+                        <div class="results">
+                            <h3>计算结果</h3>
+                            <div class="result-item">
+                                <span class="result-label">回归方程:</span>
+                                <span class="result-value" id="equationResult">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">相关系数 (R²):</span>
+                                <span class="result-value" id="rSquaredResult">-</span>
+                            </div>
+                            <div class="result-item" style="background: #e8f4ff;">
+                                <span class="result-label">样品浓度:</span>
+                                <span class="result-value" id="sampleConcentrationResult">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="interpretation">
+                            <h4>线性回归质量</h4>
+                            <p id="calibrationInterpretation">输入数据以获取回归质量评估</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- 浓度单位换算 -->
-        <div class="tab-content active" id="conversion">
+        <div class="tab-content" id="conversion">
             <div class="calculator">
                 <div class="calculator-header">
                     <h2>浓度单位换算</h2>
@@ -354,208 +529,8 @@
             </div>
         </div>
         
-        <!-- 回收率计算 -->
-        <div class="tab-content" id="recovery">
-            <div class="calculator">
-                <div class="calculator-header">
-                    <h2>回收率计算</h2>
-                    <p>计算分析方法的回收率</p>
-                </div>
-                <div class="calculator-content">
-                    <div>
-                        <div class="input-group">
-                            <label for="measuredValue">测定值</label>
-                            <input type="number" id="measuredValue" placeholder="样品的测定值">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="expectedValue">理论值/加标值</label>
-                            <input type="number" id="expectedValue" placeholder="理论值或加标值">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="sampleAmount">样品量</label>
-                            <input type="number" id="sampleAmount" placeholder="样品量 (可选)">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="spikeAmount">加标量</label>
-                            <input type="number" id="spikeAmount" placeholder="加标量 (可选)">
-                        </div>
-                        
-                        <button id="calculateRecoveryBtn" class="btn">计算回收率</button>
-                    </div>
-                    
-                    <div>
-                        <div class="results">
-                            <h3>计算结果</h3>
-                            <div class="result-item">
-                                <span class="result-label">回收率:</span>
-                                <span class="result-value" id="recoveryResult">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">回收率百分比:</span>
-                                <span class="result-value" id="recoveryPercentResult">-</span>
-                            </div>
-                        </div>
-                        
-                        <div class="interpretation">
-                            <h4>回收率解释</h4>
-                            <p id="recoveryInterpretation">输入数据以获取回收率解释</p>
-                            <p><strong>参考标准:</strong></p>
-                            <ul>
-                                <li>优秀: 95-105%</li>
-                                <li>良好: 90-110%</li>
-                                <li>可接受: 85-115%</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 相对标准偏差 (RSD) -->
-        <div class="tab-content" id="rsd">
-            <div class="calculator">
-                <div class="calculator-header">
-                    <h2>相对标准偏差 (RSD) 计算器</h2>
-                    <p>计算数据的相对标准偏差，评估测量精度</p>
-                </div>
-                <div class="calculator-content">
-                    <div>
-                        <div class="input-group">
-                            <label for="dataInput">输入数值（每行一个或逗号分隔）</label>
-                            <textarea id="dataInput" placeholder="例如：
-23.5
-24.1
-22.8
-23.9
-24.5
-或
-23.5, 24.1, 22.8, 23.9, 24.5"></textarea>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="decimalPlaces">小数位数</label>
-                            <select id="decimalPlaces">
-                                <option value="2">2 位小数</option>
-                                <option value="3">3 位小数</option>
-                                <option value="4">4 位小数</option>
-                                <option value="5">5 位小数</option>
-                            </select>
-                        </div>
-                        
-                        <button id="calculateRsdBtn" class="btn">计算 RSD</button>
-                        <button id="clearRsdBtn" class="btn btn-clear" style="margin-top: 10px;">清除数据</button>
-                    </div>
-                    
-                    <div>
-                        <div class="results">
-                            <h3>计算结果</h3>
-                            <div class="result-item">
-                                <span class="result-label">数据数量 (n):</span>
-                                <span class="result-value" id="dataCount">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">平均值 (μ):</span>
-                                <span class="result-value" id="meanValue">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">标准偏差 (σ):</span>
-                                <span class="result-value" id="stdDevValue">-</span>
-                            </div>
-                            <div class="result-item" style="background: #e8f4ff;">
-                                <span class="result-label">相对标准偏差 (RSD):</span>
-                                <span class="result-value" id="rsdValue">-</span>
-                            </div>
-                            <div class="result-item" style="background: #e8f4ff;">
-                                <span class="result-label">RSD (%):</span>
-                                <span class="result-value" id="rsdPercentValue">-</span>
-                            </div>
-                        </div>
-                        
-                        <div class="interpretation">
-                            <h4>RSD 解释</h4>
-                            <p id="rsdInterpretation">输入数据以获取 RSD 解释</p>
-                        </div>
-                        
-                        <div class="chart-container">
-                            <canvas id="dataChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 标准曲线拟合 -->
-        <div class="tab-content" id="calibration">
-            <div class="calculator">
-                <div class="calculator-header">
-                    <h2>标准曲线拟合</h2>
-                    <p>使用标准品数据拟合标准曲线并计算未知样品浓度</p>
-                </div>
-                <div class="calculator-content">
-                    <div>
-                        <div class="input-group">
-                            <label for="calibrationData">标准品数据 (浓度,响应值)</label>
-                            <textarea id="calibrationData" placeholder="每行一组数据，格式：浓度,响应值
-例如：
-0.1, 125
-0.2, 250
-0.5, 620
-1.0, 1250
-2.0, 2480"></textarea>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="sampleResponse">未知样品响应值</label>
-                            <input type="number" id="sampleResponse" placeholder="输入未知样品的响应值">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="fitMethod">拟合方法</label>
-                            <select id="fitMethod">
-                                <option value="linear">线性拟合 (y = ax + b)</option>
-                                <option value="quadratic">二次多项式拟合</option>
-                            </select>
-                        </div>
-                        
-                        <button id="calculateCalibrationBtn" class="btn">计算浓度</button>
-                        <button id="clearCalibrationBtn" class="btn btn-clear" style="margin-top: 10px;">清除数据</button>
-                    </div>
-                    
-                    <div>
-                        <div class="results">
-                            <h3>计算结果</h3>
-                            <div class="result-item">
-                                <span class="result-label">拟合方程:</span>
-                                <span class="result-value" id="equationResult">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">相关系数 (R²):</span>
-                                <span class="result-value" id="rSquaredResult">-</span>
-                            </div>
-                            <div class="result-item" style="background: #e8f4ff;">
-                                <span class="result-label">样品浓度:</span>
-                                <span class="result-value" id="sampleConcentrationResult">-</span>
-                            </div>
-                        </div>
-                        
-                        <div class="interpretation">
-                            <h4>拟合质量</h4>
-                            <p id="calibrationInterpretation">输入数据以获取拟合质量评估</p>
-                        </div>
-                        
-                        <div class="chart-container">
-                            <canvas id="calibrationChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <div class="footer">
-            <p>计算工具集 &copy; 2025 | 为实验提供计算支持</p>
+            <p>分析计算工具集 &copy; 2025 | 为实验提供计算支持</p>
         </div>
     </div>
 
@@ -638,8 +613,6 @@
         });
         
         // RSD计算功能
-        let dataChart = null;
-        
         document.getElementById('calculateRsdBtn').addEventListener('click', function() {
             calculateRSD();
         });
@@ -649,9 +622,7 @@
             resetRSDResults();
         });
         
-        // 标准曲线拟合功能
-        let calibrationChart = null;
-        
+        // 线性回归计算功能
         document.getElementById('calculateCalibrationBtn').addEventListener('click', function() {
             calculateCalibration();
         });
@@ -661,101 +632,6 @@
             document.getElementById('sampleResponse').value = '';
             resetCalibrationResults();
         });
-        
-        // 初始化图表
-        function initCharts() {
-            // RSD图表
-            const ctx = document.getElementById('dataChart').getContext('2d');
-            dataChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: '数据值',
-                        data: [],
-                        backgroundColor: 'rgba(26, 42, 108, 0.7)',
-                        borderColor: 'rgba(26, 42, 108, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: '数值'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '数据点'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: '数据分布图'
-                        }
-                    }
-                }
-            });
-            
-            // 标准曲线图表
-            const calCtx = document.getElementById('calibrationChart').getContext('2d');
-            calibrationChart = new Chart(calCtx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: '标准品数据',
-                        data: [],
-                        backgroundColor: 'rgba(26, 42, 108, 0.7)',
-                        borderColor: 'rgba(26, 42, 108, 1)',
-                        borderWidth: 1,
-                        pointRadius: 5
-                    }, {
-                        label: '拟合曲线',
-                        data: [],
-                        type: 'line',
-                        borderColor: 'rgba(178, 31, 31, 1)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: '响应值'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '浓度'
-                            }
-                        }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '标准曲线'
-                        }
-                    }
-                }
-            });
-        }
         
         // 浓度单位换算函数
         function convertConcentration(value, fromUnit, toUnit, molecularWeight) {
@@ -886,9 +762,6 @@
             
             // 更新结果显示
             updateRSDResults(stats, data);
-            
-            // 更新图表
-            updateChart(data, stats.mean);
         }
         
         // 解析输入数据
@@ -975,32 +848,6 @@
             document.getElementById('rsdInterpretation').textContent = interpretation;
         }
         
-        // 更新RSD图表
-        function updateChart(data, mean) {
-            const labels = data.map((_, i) => `数据 ${i + 1}`);
-            
-            dataChart.data.labels = labels;
-            dataChart.data.datasets[0].data = data;
-            
-            // 如果之前有平均线，移除它
-            if (dataChart.data.datasets.length > 1) {
-                dataChart.data.datasets = [dataChart.data.datasets[0]];
-            }
-            
-            // 添加平均线
-            dataChart.data.datasets.push({
-                label: '平均值',
-                data: Array(data.length).fill(mean),
-                type: 'line',
-                borderColor: 'rgba(178, 31, 31, 1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: false
-            });
-            
-            dataChart.update();
-        }
-        
         // 重置RSD结果
         function resetRSDResults() {
             document.getElementById('dataCount').textContent = '-';
@@ -1009,21 +856,12 @@
             document.getElementById('rsdValue').textContent = '-';
             document.getElementById('rsdPercentValue').textContent = '-';
             document.getElementById('rsdInterpretation').textContent = '输入数据以获取 RSD 解释';
-            
-            // 重置图表
-            dataChart.data.labels = [];
-            dataChart.data.datasets[0].data = [];
-            if (dataChart.data.datasets.length > 1) {
-                dataChart.data.datasets = [dataChart.data.datasets[0]];
-            }
-            dataChart.update();
         }
         
-        // 标准曲线拟合计算
+        // 线性回归计算
         function calculateCalibration() {
             const inputText = document.getElementById('calibrationData').value.trim();
             const sampleResponse = parseFloat(document.getElementById('sampleResponse').value);
-            const fitMethod = document.getElementById('fitMethod').value;
             
             if (!inputText) {
                 alert('请输入标准品数据');
@@ -1043,17 +881,14 @@
                 return;
             }
             
-            // 进行曲线拟合
-            const result = fitCalibrationCurve(calibrationData, fitMethod);
+            // 进行线性回归
+            const result = linearRegression(calibrationData);
             
             // 计算样品浓度
-            const sampleConcentration = calculateConcentrationFromResponse(sampleResponse, result, fitMethod);
+            const sampleConcentration = (sampleResponse - result.b) / result.a;
             
             // 更新结果显示
-            updateCalibrationResults(result, sampleConcentration, fitMethod);
-            
-            // 更新图表
-            updateCalibrationChart(calibrationData, result, fitMethod, sampleResponse, sampleConcentration);
+            updateCalibrationResults(result, sampleConcentration);
         }
         
         // 解析标准品数据
@@ -1079,77 +914,37 @@
             return data;
         }
         
-        // 曲线拟合
-        function fitCalibrationCurve(data, method) {
+        // 线性回归
+        function linearRegression(data) {
             const xValues = data.map(point => point.x);
             const yValues = data.map(point => point.y);
             
-            if (method === 'linear') {
-                // 线性回归 y = ax + b
-                const n = data.length;
-                const sumX = xValues.reduce((a, b) => a + b, 0);
-                const sumY = yValues.reduce((a, b) => a + b, 0);
-                const sumXY = data.reduce((sum, point) => sum + point.x * point.y, 0);
-                const sumX2 = xValues.reduce((sum, x) => sum + x * x, 0);
-                
-                const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-                const b = (sumY - a * sumX) / n;
-                
-                // 计算R²
-                const yMean = sumY / n;
-                const ssTot = yValues.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
-                const ssRes = data.reduce((sum, point) => sum + Math.pow(point.y - (a * point.x + b), 2), 0);
-                const rSquared = 1 - (ssRes / ssTot);
-                
-                return {
-                    a: a,
-                    b: b,
-                    rSquared: rSquared,
-                    equation: `y = ${a.toFixed(4)}x + ${b.toFixed(4)}`
-                };
-            } else if (method === 'quadratic') {
-                // 二次多项式拟合 y = ax² + bx + c
-                // 使用回归库进行二次多项式拟合
-                const result = regression.polynomial(data, { order: 2 });
-                return {
-                    a: result.equation[2],
-                    b: result.equation[1],
-                    c: result.equation[0],
-                    rSquared: result.r2,
-                    equation: `y = ${result.equation[2].toFixed(4)}x² + ${result.equation[1].toFixed(4)}x + ${result.equation[0].toFixed(4)}`
-                };
-            }
+            // 线性回归 y = ax + b
+            const n = data.length;
+            const sumX = xValues.reduce((a, b) => a + b, 0);
+            const sumY = yValues.reduce((a, b) => a + b, 0);
+            const sumXY = data.reduce((sum, point) => sum + point.x * point.y, 0);
+            const sumX2 = xValues.reduce((sum, x) => sum + x * x, 0);
+            
+            const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b = (sumY - a * sumX) / n;
+            
+            // 计算R²
+            const yMean = sumY / n;
+            const ssTot = yValues.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
+            const ssRes = data.reduce((sum, point) => sum + Math.pow(point.y - (a * point.x + b), 2), 0);
+            const rSquared = 1 - (ssRes / ssTot);
+            
+            return {
+                a: a,
+                b: b,
+                rSquared: rSquared,
+                equation: `y = ${a.toFixed(4)}x + ${b.toFixed(4)}`
+            };
         }
         
-        // 从响应值计算浓度
-        function calculateConcentrationFromResponse(response, result, method) {
-            if (method === 'linear') {
-                // 线性方程: y = ax + b => x = (y - b) / a
-                return (response - result.b) / result.a;
-            } else if (method === 'quadratic') {
-                // 二次方程: y = ax² + bx + c
-                // 解二次方程: ax² + bx + (c - y) = 0
-                const a = result.a;
-                const b = result.b;
-                const c = result.c - response;
-                
-                // 计算判别式
-                const discriminant = b * b - 4 * a * c;
-                
-                if (discriminant < 0) {
-                    return NaN; // 无实数解
-                }
-                
-                // 返回正根（浓度应为正数）
-                const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-                const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-                
-                return root1 > 0 ? root1 : root2;
-            }
-        }
-        
-        // 更新标准曲线结果
-        function updateCalibrationResults(result, concentration, method) {
+        // 更新线性回归结果
+        function updateCalibrationResults(result, concentration) {
             document.getElementById('equationResult').textContent = result.equation;
             document.getElementById('rSquaredResult').textContent = result.rSquared.toFixed(4);
             document.getElementById('sampleConcentrationResult').textContent = isNaN(concentration) ? 
@@ -1158,80 +953,28 @@
             // 更新拟合质量解释
             let interpretation = '';
             if (result.rSquared > 0.99) {
-                interpretation = '拟合质量优秀，曲线相关性很好。';
+                interpretation = '线性关系优秀，相关性很好。';
             } else if (result.rSquared > 0.95) {
-                interpretation = '拟合质量良好，曲线相关性较好。';
+                interpretation = '线性关系良好，相关性较好。';
             } else if (result.rSquared > 0.90) {
-                interpretation = '拟合质量可接受，曲线相关性一般。';
+                interpretation = '线性关系可接受，相关性一般。';
             } else {
-                interpretation = '拟合质量较差，建议检查数据或尝试其他拟合方法。';
+                interpretation = '线性关系较差，建议检查数据。';
             }
             
             document.getElementById('calibrationInterpretation').textContent = interpretation;
         }
         
-        // 更新标准曲线图表
-        function updateCalibrationChart(data, result, method, sampleResponse, sampleConcentration) {
-            // 更新标准品数据点
-            calibrationChart.data.datasets[0].data = data;
-            
-            // 生成拟合曲线数据
-            const minX = Math.min(...data.map(point => point.x));
-            const maxX = Math.max(...data.map(point => point.x));
-            const step = (maxX - minX) / 100;
-            
-            const fitData = [];
-            for (let x = minX; x <= maxX; x += step) {
-                let y;
-                if (method === 'linear') {
-                    y = result.a * x + result.b;
-                } else if (method === 'quadratic') {
-                    y = result.a * x * x + result.b * x + result.c;
-                }
-                fitData.push({ x: x, y: y });
-            }
-            
-            calibrationChart.data.datasets[1].data = fitData;
-            
-            // 如果计算出了样品浓度，添加样品点
-            if (!isNaN(sampleConcentration)) {
-                if (calibrationChart.data.datasets.length > 2) {
-                    calibrationChart.data.datasets[2].data = [{ x: sampleConcentration, y: sampleResponse }];
-                } else {
-                    calibrationChart.data.datasets.push({
-                        label: '未知样品',
-                        data: [{ x: sampleConcentration, y: sampleResponse }],
-                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                        borderColor: 'rgba(255, 152, 0, 1)',
-                        borderWidth: 2,
-                        pointRadius: 8
-                    });
-                }
-            }
-            
-            calibrationChart.update();
-        }
-        
-        // 重置标准曲线结果
+        // 重置线性回归结果
         function resetCalibrationResults() {
             document.getElementById('equationResult').textContent = '-';
             document.getElementById('rSquaredResult').textContent = '-';
             document.getElementById('sampleConcentrationResult').textContent = '-';
-            document.getElementById('calibrationInterpretation').textContent = '输入数据以获取拟合质量评估';
-            
-            // 重置图表
-            calibrationChart.data.datasets[0].data = [];
-            calibrationChart.data.datasets[1].data = [];
-            if (calibrationChart.data.datasets.length > 2) {
-                calibrationChart.data.datasets = calibrationChart.data.datasets.slice(0, 2);
-            }
-            calibrationChart.update();
+            document.getElementById('calibrationInterpretation').textContent = '输入数据以获取回归质量评估';
         }
         
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
-            initCharts();
-            
             // 设置示例数据
             document.getElementById('dataInput').value = "23.5\n24.1\n22.8\n23.9\n24.5";
             document.getElementById('calibrationData').value = "0.1, 125\n0.2, 250\n0.5, 620\n1.0, 1250\n2.0, 2480";
